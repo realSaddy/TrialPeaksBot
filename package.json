@@ -1,0 +1,25 @@
+{
+  "name": "trail-peaks",
+  "version": "0.0.1",
+  "description": "A discord bot for the Trial Peaks discord server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^11.3.2",
+    "sqlite": "^2.9.1",
+    "util": "^0.10.3"
+  },
+  "engines": {
+    "node": "9.x"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "discord",
+    "bot",
+    "discord.js",
+    "template"
+  ]
+}

@@ -1,2 +1,6 @@
-# TrialPeaksBot
-A bot for the Trial Peaks Discord server as requested.
+Trial Peaks Discord Bot
+=========================
+
+This bot is for Trial Peak's Discord server
+[https://discord.gg/69UtrrT](https://discord.gg/69UtrrT)
+-------------------
