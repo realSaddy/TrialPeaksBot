@@ -61,6 +61,11 @@ client.on("ready", () => {
   console.log("Bot is online!");
   client.user.setPresence({ game: { name: "!help for commands!", streaming: true, url: "https://www.twitch.tv/realsaddy" }});
 });
+client.on("guildCreate", guild => {
+  if(guild.id !== "361679179571396615") {
+    return guild.leave()
+  }
+});
 
 client.on("message", async message => {
   if(message.author.bot) return;
@@ -144,6 +149,7 @@ client.on("message", async message => {
       if(name.length > 50) {
         return message.reply("There is a max of 50 characters per name. Try using abbreviations")
       }
+      if(message.guild.channels.find("name", name)) return message.reply("Another channel with that name already exists")
         //add sql to the amount of rooms he has checked out
       sql.get(`SELECT * FROM checkedout WHERE id = ${message.author.id}`).then(row =>  {
         if(!row) {
@@ -279,38 +285,78 @@ message.channel.send({ embed });
         if(!user){
           return message.reply("I can not seem to find that user.")
         }
-        let channel = message.guild.channels.find("id", row.id)
+        if(user.id === "421721516535840781") {
+          message.channel.send("I am always with you, "+message.author)
+            return message.channel.send(new Discord.Attachment("https://cdn.glitch.com/5fec7b81-6188-4742-b39a-0e48b3ed4686%2Ftemp.png?1521166635836", "stalk.png"));
+       
+        }
+          let channel = message.guild.channels.find("id", row.id)
         if(!channel) {
           return message.reply("You don't own a room or an error has occured. Please try again. If this continues please dm <@!210542490539786240>.")
         }
-        if(channel.overwritePermissions(user, { SEND_MESSAGES: true}))  return message.reply(user+" is already invited")
-        if(
+        if(channel.permissionsFor(user).has("SEND_MESSAGES"))  return message.reply(user+" is already invited or is an admin.") 
         channel.overwritePermissions(user, {
           SEND_MESSAGES: true
         }).then(channel => {
-      var embed = {
-        "title":  "Invited",
-        "color": 6770057,
-        "timestamp": "2018-03-11T19:54:20.420Z",
-        "fields": [
-    {
-         "name": "Invited to",
-         "value": "<#"+row.id+">"
-       },
-       {
-         "name": "By:",
-         "value": "<@"+message.author.id+">"
-       }
-    ]
-  };
-          user.send(embed)
+          const embed = {
+            "title": "Invited",
+            "color": 6770057,
+            "timestamp": "2018-03-16T01:59:52.014Z",
+            "fields": [
+              {
+                "name": "Invited To",
+                "value": `<#${channel.id}>`
+              },
+              {
+                "name": "Invited By",
+                "value": `${message.author}`
+              }
+            ]
+          };
+        user.send({ embed });
           message.channel.send(user+" has been added to your channel")
-        }));
+        });
                 
                                                                                }).catch(() => { 
         return message.reply("You don't own a room or an error has occured. Please try again. If this continues please dm <@!210542490539786240>.")
       });
                                                                                
       break;
+    case "kick":
+       sql.get(`SELECT * FROM ownedby WHERE owner = ${message.author.id}`).then(row => {
+          if(args.length < 2 || message.mentions.users.size === 0 || args.length > 2) return message.reply("Please tag the user you wish to invite")
+          let user = message.guild.member(message.mentions.users.first());
+          if(!user){
+            return message.reply("I can not seem to find that user.")
+          }
+         let channel = message.guild.channels.find("id", row.id)
+          if(!channel) {
+            return message.reply("You don't own a room or an error has occured. Please try again. If this continues please dm <@!210542490539786240>.")
+          }
+          if(!channel.permissionsFor(user).has("SEND_MESSAGES"))  return message.reply(user+" is not invited.") 
+          channel.overwritePermissions(user, {
+            SEND_MESSAGES: false
+          }).then(channel => {
+            const embed = {
+              "title": "Kicked",
+              "color": 6770057,
+              "timestamp": "2018-03-16T01:59:52.014Z",
+              "fields": [
+                {
+                  "name": "Kicked From",
+                  "value": `<#${channel.id}>`
+                },
+                {
+                  "name": "By",
+                  "value": `${message.author}`
+                }
+              ]
+            };
+          user.send({ embed });
+            message.channel.send(user+" has been kicked from your channel")
+          });
+                                                                                     }).catch(() => { 
+        return message.reply("You don't own a room or an error has occured. Please try again. If this continues please dm <@!210542490539786240>.")
+      });
                                }});
 client.login(process.env.BOT_TOKEN);
